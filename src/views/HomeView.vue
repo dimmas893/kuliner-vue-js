@@ -58,7 +58,7 @@ export default {
   },
   mounted() {
     axios
-      .get("https://anandadimmasbudiarto.my.id/kuliner/api/best-products")
+      .get(this.$api + "/best-products")
       .then((response) => {
         this.setProducts(response.data);
       })

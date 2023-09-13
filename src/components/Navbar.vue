@@ -42,6 +42,22 @@
               }}</span>
             </router-link>
           </li>
+          <li class="nav-item">
+            <router-link
+              :to="{ name: 'login' }"
+              v-if="!loggedIn"
+              class="nav-link"
+              >login</router-link
+            >
+            <!-- Add a logout button for logged-in users -->
+            <button
+              @click="logout"
+              v-if="loggedIn"
+              class="btn btn-danger mx-2 my-2 my-sm-0"
+            >
+              LOGOUT
+            </button>
+          </li>
         </div>
       </div>
     </div>
@@ -55,6 +71,7 @@ export default {
   data() {
     return {
       navbarOpen: false,
+      loggedIn: null,
       jumlah_pesanans: [],
     };
   },
@@ -69,10 +86,30 @@ export default {
     closeNavbar() {
       this.navbarOpen = false;
     },
+    getLoggedIn() {
+      this.loggedIn = localStorage.getItem("loggedIn");
+    },
+    logout() {
+      axios.get("http://localhost:8000/api/logout").then(() => {
+        //remove localStorage
+        localStorage.removeItem("loggedIn");
+
+        //redirect
+        return this.$router.push({ name: "login" });
+      });
+    },
+  },
+  watch: {
+    $route: {
+      immediate: true,
+      handler() {
+        this.getLoggedIn();
+      },
+    },
   },
   mounted() {
     axios
-      .get("http://localhost:3004/keranjangs")
+      .get(this.$api + "/keranjangs")
       .then((response) => this.setJumlah(response.data))
       .catch((error) => console.log(error));
   },

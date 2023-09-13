@@ -11,7 +11,7 @@
                 <router-link to="/" class="text-dark">Home</router-link>
               </li>
               <li class="breadcrumb-item">
-                <router-link to="/foods" class="text-dark">Foods</router-link>
+                <router-link to="/food" class="text-dark">Foods</router-link>
               </li>
               <li class="breadcrumb-item active" aria-current="page">
                 Keranjang
@@ -75,6 +75,7 @@
                     <i
                       class="bi bi-trash"
                       @click="hapusKeranjang(keranjang.id)"
+                      style="cursor: pointer"
                     ></i>
                   </td>
                 </tr>
@@ -122,7 +123,16 @@
               class="btn btn-success float-right mt-3"
               @click="checkout"
             >
-              <i class="bi bi-cart"></i>Pesan
+              <div v-if="!loading">
+                <!-- Tambahkan v-if="!loading" di sini -->
+                <i class="bi bi-cart"></i>Pesan
+              </div>
+              <div v-else>
+                <img
+                  src="../assets/loading.gif"
+                  style="width: 50px; height: 30px"
+                />
+              </div>
             </button>
           </form>
         </div>
@@ -143,6 +153,7 @@ export default {
     return {
       keranjangs: [],
       pesan: {},
+      loading: false,
     };
   },
   methods: {
@@ -151,9 +162,7 @@ export default {
     },
     hapusKeranjang(id) {
       axios
-        .delete(
-          "https://anandadimmasbudiarto.my.id/kuliner/api/keranjangs/" + id
-        )
+        .delete(this.$api + "/keranjangs/" + id)
         .then((response) => {
           // Tambahkan parameter response di sini
           this.$toast.error(response.data.message, {
@@ -165,7 +174,7 @@ export default {
 
           // Update Data keranjang
           axios
-            .get("https://anandadimmasbudiarto.my.id/kuliner/api/keranjangs")
+            .get(this.$api + "/keranjangs")
             .then((response) => this.setKeranjangs(response.data))
             .catch((error) => console.log(error));
         })
@@ -173,20 +182,15 @@ export default {
     },
 
     checkout() {
+      this.loading = true; // Aktifkan loading
       this.pesan.keranjangs = this.keranjangs;
       axios
-        .post(
-          "https://anandadimmasbudiarto.my.id/kuliner/api/pesanans",
-          this.pesan
-        )
+        .post(this.$api + "/pesanans", this.pesan)
         .then(() => {
           // Hapus Semua Keranjang
           this.keranjangs.map(function (item) {
             return axios
-              .delete(
-                "https://anandadimmasbudiarto.my.id/kuliner/api/keranjangs/" +
-                  item.id
-              )
+              .delete(this.$api + "/keranjangs/" + item.id)
               .catch((error) => console.log(error));
           });
           this.$router.push({ path: "/pesanan-sukses" });
@@ -228,12 +232,15 @@ export default {
               dismissible: true,
             });
           }
+        })
+        .finally(() => {
+          this.loading = false; // Matikan loading setelah selesai
         });
     },
   },
   mounted() {
     axios
-      .get("https://anandadimmasbudiarto.my.id/kuliner/api/keranjangs")
+      .get(this.$api + "/keranjangs")
       .then((response) => this.setKeranjangs(response.data))
       .catch((error) => console.log(error));
   },

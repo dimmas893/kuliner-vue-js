@@ -60,8 +60,18 @@
               type="submit"
               class="btn btn-success mt-3"
               @click="pemesanan"
+              :disabled="loading"
             >
-              <i class="bi bi-cart"></i>Pesan
+              <div v-if="!loading">
+                <!-- Tambahkan v-if="!loading" di sini -->
+                <i class="bi bi-cart"></i>Pesan
+              </div>
+              <div v-else>
+                <img
+                  src="../assets/loading.gif"
+                  style="width: 50px; height: 30px"
+                />
+              </div>
             </button>
           </form>
         </div>
@@ -82,6 +92,7 @@ export default {
     return {
       product: {},
       pesan: {},
+      loading: false,
     };
   },
   methods: {
@@ -89,12 +100,10 @@ export default {
       this.product = data;
     },
     pemesanan() {
+      this.loading = true; // Aktifkan loading
       this.pesan.product_id = this.product.id;
       axios
-        .post(
-          "https://anandadimmasbudiarto.my.id/kuliner/api/keranjangs",
-          this.pesan
-        )
+        .post(this.$api + "/keranjangs", this.pesan)
         .then((response) => {
           this.$router.push({ path: "/keranjang" });
           this.$toast.success(response.data.message, {
@@ -135,15 +144,15 @@ export default {
               dismissible: true,
             });
           }
+        })
+        .finally(() => {
+          this.loading = false; // Matikan loading setelah selesai
         });
     },
   },
   mounted() {
     axios
-      .get(
-        "https://anandadimmasbudiarto.my.id/kuliner/api/products/" +
-          this.$route.params.id
-      )
+      .get(this.$api + "/products/" + this.$route.params.id)
       .then((response) => this.setProduct(response.data))
       .catch((error) => console.log(error));
   },

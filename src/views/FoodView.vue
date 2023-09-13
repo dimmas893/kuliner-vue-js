@@ -78,17 +78,14 @@ export default {
     searchFood() {
       this.loading = true; // Ketika mencari, atur loading menjadi true
       axios
-        .get(
-          "https://anandadimmasbudiarto.my.id/kuliner/api/products?search=" +
-            this.search
-        )
+        .get(this.$api + "/products?search=" + this.search)
         .then((response) => this.setProducts(response.data))
         .catch((error) => console.log(error));
     },
   },
   mounted() {
     axios
-      .get("https://anandadimmasbudiarto.my.id/kuliner/api/products")
+      .get(this.$api + "/products")
       .then((response) => this.setProducts(response.data))
       .catch((error) => console.log(error));
   },
