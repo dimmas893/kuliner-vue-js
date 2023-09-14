@@ -7,7 +7,6 @@ import './assets/main.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import VueToast from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-default.css';
-
 const app = createApp(App);
 
 // Tambahkan variabel global api
