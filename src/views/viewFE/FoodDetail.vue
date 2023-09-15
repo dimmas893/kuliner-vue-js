@@ -1,6 +1,6 @@
 <template>
   <NavbarComponent :updateKeranjang="keranjangs" />
-  <div class="">
+  <div class="content-below-navbar">
     <div class="container">
       <!-- breadcrumb -->
       <div class="row">
@@ -68,7 +68,7 @@
               </div>
               <div v-else>
                 <img
-                  src="../assets/loading.gif"
+                  src="../../assets/loading.gif"
                   style="width: 50px; height: 30px"
                 />
               </div>
@@ -82,7 +82,7 @@
 
 <script>
 import axios from "axios";
-import NavbarComponent from "@/components/Navbar.vue";
+import NavbarComponent from "@/components/componentFE/Navbar.vue";
 export default {
   name: "FoodDetailView",
   components: {
@@ -103,7 +103,7 @@ export default {
       this.loading = true; // Aktifkan loading
       this.pesan.product_id = this.product.id;
       axios
-        .post(this.$api + "/keranjangs", this.pesan)
+        .post(this.$api + "/api/keranjangs", this.pesan)
         .then((response) => {
           this.$router.push({ path: "/keranjang" });
           this.$toast.success(response.data.message, {
@@ -152,7 +152,7 @@ export default {
   },
   mounted() {
     axios
-      .get(this.$api + "/products/" + this.$route.params.id)
+      .get(this.$api + "/api/products/" + this.$route.params.id)
       .then((response) => this.setProduct(response.data))
       .catch((error) => console.log(error));
   },

@@ -1,6 +1,6 @@
 <template>
-  <NavbarComponent />
-  <div class="dashboard" style="margin-top: 80px">
+  <ProductComponentBE />
+  <div class="dashboard" style="margin-top: 20px">
     <div class="container">
       <div class="row">
         <div class="col-md-4">
@@ -46,13 +46,12 @@
 
 <script>
 import axios from "axios";
-import NavbarComponent from "@/components/Navbar.vue";
+import ProductComponentBE from "@/components/componentBE/Navbar.vue";
 
 export default {
   name: "DashboardPage",
-
   components: {
-    NavbarComponent,
+    ProductComponentBE,
   },
   data() {
     return {
@@ -66,7 +65,7 @@ export default {
   },
   created() {
     axios
-      .get("http://localhost:8000/api/user", {
+      .get(this.$api + "/api/user", {
         headers: { Authorization: "Bearer " + this.token },
       })
       .then((response) => {
@@ -77,7 +76,7 @@ export default {
 
   methods: {
     logout() {
-      axios.get("http://localhost:8000/api/logout").then(() => {
+      axios.get(this.$api + "/api/logout").then(() => {
         //remove localStorage
         localStorage.removeItem("loggedIn");
 

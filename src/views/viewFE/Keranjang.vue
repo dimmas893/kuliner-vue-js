@@ -1,6 +1,6 @@
 <template>
   <NavbarComponent :updateKeranjang="keranjangs" />
-  <div class="keranjang">
+  <div class="content-below-navbar">
     <div class="container">
       <!-- breadcrumb -->
       <div class="row">
@@ -129,7 +129,7 @@
               </div>
               <div v-else>
                 <img
-                  src="../assets/loading.gif"
+                  src="../../assets/loading.gif"
                   style="width: 50px; height: 30px"
                 />
               </div>
@@ -142,7 +142,7 @@
 </template>
 
 <script>
-import NavbarComponent from "@/components/Navbar.vue";
+import NavbarComponent from "@/components/componentFE/Navbar.vue";
 import axios from "axios";
 export default {
   name: "KeranjangView",
@@ -162,7 +162,7 @@ export default {
     },
     hapusKeranjang(id) {
       axios
-        .delete(this.$api + "/keranjangs/" + id)
+        .delete(this.$api + "/api/keranjangs/" + id)
         .then((response) => {
           // Tambahkan parameter response di sini
           this.$toast.error(response.data.message, {
@@ -174,7 +174,7 @@ export default {
 
           // Update Data keranjang
           axios
-            .get(this.$api + "/keranjangs")
+            .get(this.$api + "/api/keranjangs")
             .then((response) => this.setKeranjangs(response.data))
             .catch((error) => console.log(error));
         })
@@ -185,12 +185,12 @@ export default {
       this.loading = true; // Aktifkan loading
       this.pesan.keranjangs = this.keranjangs;
       axios
-        .post(this.$api + "/pesanans", this.pesan)
+        .post(this.$api + "/api/pesanans", this.pesan)
         .then(() => {
           // Hapus Semua Keranjang
           this.keranjangs.map(function (item) {
             return axios
-              .delete(this.$api + "/keranjangs/" + item.id)
+              .delete(this.$api + "/api/keranjangs/" + item.id)
               .catch((error) => console.log(error));
           });
           this.$router.push({ path: "/pesanan-sukses" });
@@ -240,7 +240,7 @@ export default {
   },
   mounted() {
     axios
-      .get(this.$api + "/keranjangs")
+      .get(this.$api + "/api/keranjangs")
       .then((response) => this.setKeranjangs(response.data))
       .catch((error) => console.log(error));
   },

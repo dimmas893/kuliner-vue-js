@@ -1,16 +1,12 @@
 <template>
   <div id="app">
-    <div class="container">
-      <div class="content-below-navbar">
-        <router-view />
-      </div>
-    </div>
+    <router-view />
     <FooterComponent />
   </div>
 </template>
 
 <script>
-import FooterComponent from "@/components/Footer.vue";
+import FooterComponent from "@/components/componentFE/Footer.vue";
 
 export default {
   name: "HomeView",

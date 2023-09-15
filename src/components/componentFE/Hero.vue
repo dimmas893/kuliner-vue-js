@@ -18,7 +18,7 @@
           </div>
         </div>
         <div class="col-md-6">
-          <img src="../assets/images/hero.png" />
+          <img src="@/assets/images/hero.png" />
         </div>
       </div>
     </div>
@@ -27,7 +27,7 @@
     <div class="d-sm-block d-md-none">
       <div class="row mt-4">
         <div class="col-md-6 mb-3">
-          <img src="../assets/images/hero.png" style="width: 100%" />
+          <img src="@/assets/images/hero.png" style="width: 100%" />
           <!-- Tambahkan style di sini -->
         </div>
         <div class="col-md-6">

@@ -109,7 +109,7 @@ export default {
   },
   mounted() {
     axios
-      .get(this.$api + "/keranjangs")
+      .get(this.$api + "/api/keranjangs")
       .then((response) => this.setJumlah(response.data))
       .catch((error) => console.log(error));
   },

@@ -51,7 +51,7 @@
 
 <script>
 import axios from "axios";
-import NavbarComponent from "@/components/Navbar.vue";
+import NavbarComponent from "@/components/componentFE/Navbar.vue";
 
 export default {
   name: "LoginPage",
@@ -78,49 +78,47 @@ export default {
   },
   // mounted() {
   //   axios
-  //     .get(this.$api + "/keranjangs")
+  //     .get(this.$api + "/api/keranjangs")
   //     .then((response) => this.setKeranjangs(response.data))
   //     .catch((error) => console.log(error));
   // },
   methods: {
     login() {
       if (this.user.email && this.user.password) {
-        axios
-          .get("http://localhost:8000/sanctum/csrf-cookie")
-          .then((response) => {
-            //debug cookie
-            console.log(response);
+        axios.get(this.$api + "/sanctum/csrf-cookie").then((response) => {
+          //debug cookie
+          console.log(response);
 
-            axios
-              .post("http://localhost:8000/api/login", {
-                email: this.user.email,
-                password: this.user.password,
-              })
-              .then((res) => {
-                //debug user login
-                console.log(res);
+          axios
+            .post(this.$api + "/api/login", {
+              email: this.user.email,
+              password: this.user.password,
+            })
+            .then((res) => {
+              //debug user login
+              console.log(res);
 
-                if (res.data.success) {
-                  //set localStorage
-                  localStorage.setItem("loggedIn", true);
+              if (res.data.success) {
+                //set localStorage
+                localStorage.setItem("loggedIn", true);
 
-                  //set localStorage Token
-                  localStorage.setItem("token", res.data.token);
+                //set localStorage Token
+                localStorage.setItem("token", res.data.token);
 
-                  //change state
-                  this.loggedIn = true;
+                //change state
+                this.loggedIn = true;
 
-                  //redirect dashboard
-                  return this.$router.push({ name: "dashboard" });
-                } else {
-                  //set state login failed
-                  this.loginFailed = true;
-                }
-              })
-              .catch((error) => {
-                console.log(error);
-              });
-          });
+                //redirect dashboard
+                return this.$router.push({ name: "dashboard" });
+              } else {
+                //set state login failed
+                this.loginFailed = true;
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        });
       }
 
       this.validation = [];

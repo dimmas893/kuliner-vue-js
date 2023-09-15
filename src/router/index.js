@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import HomeView from '../views/viewFE/HomeView.vue'
 // import FoodDetail from '../views/FoodDetail.vue'
 const routes = [
   {
@@ -16,29 +16,40 @@ const routes = [
   {
     path: '/dashboard',
     name: 'dashboard',
-    component: () => import('../views/BE/dashboard/index.vue'),
+    component: () => import('../views/viewBE/dashboard/index.vue'),
     beforeEnter: authMiddleware,
   },
   {
     path: '/food',
     name: 'food',
-    component: () => import('../views/FoodView.vue')
+    component: () => import('../views/viewFE/FoodView.vue')
   },
   {
     path: '/food/:id',
     name: 'FoodDetailView',
-    component: () => import('../views/FoodDetail.vue')
+    component: () => import('../views/viewFE/FoodDetail.vue')
   },
 
   {
     path: '/keranjang',
     name: 'Keranjang',
-    component: () => import('../views/Keranjang.vue')
+    component: () => import('../views/viewFE/Keranjang.vue')
   },
   {
     path: '/pesanan-sukses',
     name: 'PesananSukses',
-    component: () => import('../views/PesananSukses.vue')
+    component: () => import('../views/viewFE/PesananSukses.vue')
+  },
+  {
+    path: '/product-admin',
+    name: 'productAdmin',
+    component: () => import('../views/viewBE/product/Product.vue')
+  },
+
+  {
+    path: '/product-admin-create',
+    name: 'productAdminCreate',
+    component: () => import('../views/viewBE/product/Create.vue')
   },
 ]
 

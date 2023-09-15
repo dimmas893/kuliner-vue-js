@@ -1,6 +1,6 @@
 <template>
   <NavbarComponent :updateKeranjang="keranjangs" />
-  <div class="home">
+  <div class="">
     <div class="container">
       <Hero />
       <div class="row mt-5">
@@ -35,10 +35,10 @@
 </template>
 
 <script>
-import Hero from "@/components/Hero.vue";
+import Hero from "@/components/componentFE/Hero.vue";
 import axios from "axios";
-import CardProduct from "@/components/CardProduct.vue";
-import NavbarComponent from "@/components/Navbar.vue";
+import CardProduct from "@/components/componentFE/CardProduct.vue";
+import NavbarComponent from "@/components/componentFE/Navbar.vue";
 export default {
   name: "HomeView",
   components: {
@@ -58,7 +58,7 @@ export default {
   },
   mounted() {
     axios
-      .get(this.$api + "/best-products")
+      .get(this.$api + "/api/best-products")
       .then((response) => {
         this.setProducts(response.data);
       })
