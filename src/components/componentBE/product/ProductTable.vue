@@ -1,32 +1,32 @@
 <template>
   <div class="container">
-    <div class="row mt-3">
-      <div class="col">
-        <div class="input-group mb-3">
-          <input
-            v-model="search"
-            type="text"
-            class="form-control"
-            placeholder="Cari Makanan Kesukaan Anda .."
-            aria-label="Cari"
-            aria-describedby="basic-addon1"
-            @keyup="searchFood"
-          />
+    <div class="row">
+      <div class="row mt-3">
+        <div class="col">
+          <div class="input-group mb-3">
+            <input
+              v-model="search"
+              type="text"
+              class="form-control"
+              placeholder="Cari Makanan Kesukaan Anda .."
+              aria-label="Cari"
+              aria-describedby="basic-addon1"
+              @keyup="initializeDataTable"
+            />
 
-          <div class="input-group-prepend">
-            <span class="input-group-text" id="basic-addon1">
-              <i class="bi bi-search"></i>
-            </span>
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="basic-addon1">
+                <i class="bi bi-search"></i>
+              </span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="row">
+      <!-- Dropdown filter untuk bestseller -->
       <div class="col-4">
-        <!-- Dropdown filter untuk bestseller -->
         <select
           v-model="bestsellerFilter"
-          @change="searchFood"
+          @change="initializeDataTable"
           class="form-control"
         >
           <option value="">---bestseller---</option>
@@ -37,7 +37,7 @@
       <div class="col-4">
         <select
           v-model="isReadyFilter"
-          @change="searchFood"
+          @change="initializeDataTable"
           class="form-control"
         >
           <option value="">---ready barang---</option>
@@ -45,98 +45,34 @@
           <option value="false">Tidak Ready</option>
         </select>
       </div>
-
-      <div class="col-4">
-        <select v-model="perPage" @change="searchFood" class="form-control">
-          <option value="">---per page---</option>
-          <option value="10">10</option>
+      <div class="col-4" id="myTable_length">
+        <select
+          v-model="itemperPagefilter"
+          @change="initializeDataTable"
+          class="form-control"
+        >
+          <option value="10" selected>10</option>
           <option value="20">20</option>
+          <option value="30">30</option>
         </select>
       </div>
     </div>
-
-    <table class="table">
+    <table
+      id="myTable"
+      class="table table-striped table-bordered"
+      style="width: 100%"
+    >
       <thead>
         <tr>
-          <th scope="col">No</th>
-          <th scope="col">Nama</th>
-          <th scope="col">Harga</th>
-          <th scope="col">Bastseller</th>
-          <th scope="col">Ready</th>
-          <th scope="col">Gambar</th>
-          <th scope="col">Action</th>
+          <th>ID</th>
+          <th>Nama</th>
+          <th>Harga</th>
+          <th>Bestseller</th>
+          <th>Ready</th>
+          <th>Action</th>
         </tr>
       </thead>
-      <tbody>
-        <tr v-for="(productData, index) in products.data" :key="productData.id">
-          <th scope="row">{{ calculateItemNumber(index) }}</th>
-          <!-- Menggunakan calculateItemNumber untuk nomor urutan -->
-          <td>{{ productData.nama }}</td>
-          <td>{{ productData.harga }}</td>
-          <td>{{ productData.bestseller }}</td>
-          <td>{{ productData.is_ready }}</td>
-          <td>
-            <img
-              :src="getProductImageUrl(productData.gambar)"
-              class="card-img-top"
-              alt="..."
-              style="width: 50px; height: 50px"
-            />
-          </td>
-          <td>
-            <button
-              @click="deleteProduct(productData.id)"
-              class="btn btn-danger"
-            >
-              Delete
-            </button>
-          </td>
-        </tr>
-      </tbody>
     </table>
-    <nav aria-label="Halaman">
-      <ul class="pagination">
-        <!-- Tombol Previous -->
-        <li class="page-item" :class="{ disabled: !products.prev_page_url }">
-          <a
-            class="page-link"
-            href="#"
-            aria-label="Previous"
-            @click="goToPage(products.current_page - 1)"
-          >
-            <span aria-hidden="true">&laquo;</span>
-          </a>
-        </li>
-
-        <!-- Nomor Halaman -->
-        <li
-          v-for="pagination in getVisiblePages()"
-          :key="pagination"
-          class="page-item"
-          :class="{ active: pagination === products.current_page }"
-        >
-          <a class="page-link" href="#" @click="goToPage(pagination)">{{
-            pagination
-          }}</a>
-        </li>
-
-        <!-- Tombol Next -->
-        <li class="page-item" :class="{ disabled: !products.next_page_url }">
-          <a
-            class="page-link"
-            href="#"
-            aria-label="Next"
-            @click="goToPage(products.current_page + 1)"
-          >
-            <span aria-hidden="true">&raquo;</span>
-          </a>
-        </li>
-      </ul>
-
-      <div class="text-center mt-3">
-        Halaman {{ products.current_page }} dari {{ products.last_page }}
-      </div>
-    </nav>
   </div>
 </template>
 
@@ -144,84 +80,34 @@
 import axios from "axios";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import "sweetalert2/dist/sweetalert2.min.css";
+import $ from "jquery";
+import "bootstrap/dist/css/bootstrap.css";
+import "datatables.net-bs4";
+
 export default {
   name: "productTable",
   props: ["product", "index"],
   data() {
     return {
-      products: [], // Ubah ke array kosong
-      search: "",
-      currentPage: 1, // Tambahkan currentPage untuk melacak halaman saat ini
-      selectOption: "",
-      bestsellerFilter: "", // Filter bestseller
-      isReadyFilter: "", // Filter is_ready
+      flickrData: {
+        items: [],
+      },
+      products: [],
+      bestsellerFilter: "",
+      isReadyFilter: "",
       perPage: 10,
-      previousPage: 1,
+      loading: false,
+      destroying: false,
+      currentPage: 1,
+      itemsPerPage: 0,
+      search: "",
+      itemperPagefilter: "10", // Default to 20 items per page
     };
   },
   methods: {
     getProductImageUrl(gambar) {
-      // Gantilah "URL_BASE" dengan URL dasar gambar yang Anda inginkan
-      const URL_BASE = this.$api + "/assets/images/"; // Sesuaikan dengan URL dasar Anda
-      // Gabungkan URL dasar dengan nama gambar dari respons API
+      const URL_BASE = this.$api + "/assets/images/";
       return URL_BASE + gambar;
-    },
-    setProducts(data) {
-      this.products = data; // Perbarui seluruh array produk
-    },
-    searchFood() {
-      // Your existing code for searching data here
-      axios
-        .get(
-          this.$api +
-            "/api/products?page=" +
-            this.currentPage +
-            "&search=" +
-            this.search +
-            "&bestseller=" +
-            this.bestsellerFilter +
-            "&is_ready=" +
-            this.isReadyFilter +
-            "&perPage=" +
-            this.perPage
-        )
-        .then((response) => this.setProducts(response.data))
-        .catch((error) => console.log(error));
-    },
-    goToPage(page) {
-      // Memastikan page tidak kurang dari 1 dan tidak lebih dari last_page
-      if (page >= 1 && page <= this.products.last_page) {
-        this.currentPage = page;
-        this.searchFood();
-      }
-    },
-
-    calculateItemNumber(index) {
-      // Menghitung nomor urutan item sesuai dengan halaman
-      return (this.currentPage - 1) * this.products.per_page + index + 1;
-    },
-    getVisiblePages() {
-      const total = this.products.last_page;
-      const current = this.products.current_page;
-      const maxVisiblePages = 5;
-
-      // Menentukan halaman pertama yang akan ditampilkan
-      let startPage = Math.max(current - Math.floor(maxVisiblePages / 2), 1);
-
-      // Menentukan halaman terakhir yang akan ditampilkan
-      let endPage = Math.min(startPage + maxVisiblePages - 1, total);
-
-      // Pastikan tidak melewati batas
-      if (endPage - startPage + 1 < maxVisiblePages) {
-        startPage = Math.max(endPage - maxVisiblePages + 1, 1);
-      }
-
-      const pages = [];
-      for (let i = startPage; i <= endPage; i++) {
-        pages.push(i);
-      }
-
-      return pages;
     },
     deleteProduct(productId) {
       Swal.fire({
@@ -245,8 +131,9 @@ export default {
                   duration: 3000,
                   dismissible: true,
                 });
-                // Refresh daftar produk setelah menghapus
-                this.searchFood();
+
+                // After successful deletion, refresh the table on page 2
+                this.initializeDataTable();
               } else {
                 Swal.fire("Gagal!", "Gagal menghapus produk.", "error");
               }
@@ -262,11 +149,82 @@ export default {
         }
       });
     },
+    initializeDataTable() {
+      const self = this;
+      // const currentEntriesFilter = self.itemperPagefilter;
+      axios
+        .get(
+          this.$api +
+            "/api/products?bestseller=" +
+            this.bestsellerFilter +
+            "&is_ready=" +
+            this.isReadyFilter +
+            "&search=" +
+            this.search
+        )
+        .then((response) => {
+          const table = $("#myTable").DataTable({
+            destroy: true,
+            paging: true,
+            lengthChange: false,
+            searching: false,
+            order: [0, "asc"],
+            data: response.data, // Use the response data here
+            columns: [
+              { data: "id" },
+              { data: "nama" },
+              { data: "harga" },
+              { data: "bestseller" },
+              { data: "is_ready" },
+              {
+                data: null,
+                render: function (data, type, row) {
+                  return `
+              <button data-id="${row.id}" class="btn btn-danger btn-delete">Delete</button>
+            `;
+                },
+              },
+            ],
+          });
+
+          table.page.len(self.itemperPagefilter).draw();
+          // Tambahkan event listener untuk event "draw.dt"
+          table.on("draw.dt", function () {
+            const pageInfo = table.page.info();
+            const currentPage = pageInfo.page; // Halaman saat ini (indeks berbasis 0)
+            const pageSize = table.page.len(); // Jumlah item per halaman
+
+            let dataStart = currentPage * pageSize; // Indeks awal data pada halaman saat ini
+            let dataEnd = dataStart + pageSize; // Indeks akhir data pada halaman saat ini
+
+            // Jika ini halaman terakhir, hitung ulang dataEnd
+            if (currentPage === pageInfo.pages - 1) {
+              dataEnd = pageInfo.recordsTotal; // Total data dalam tabel
+            }
+
+            self.itemsPerPage = dataEnd - dataStart; // Set itemsPerPage dengan nilai yang sesuai
+            self.currentPage = currentPage + 1; // Set currentPage dengan nilai yang sesuai
+          });
+          if (self.itemsPerPage === 1) {
+            self.goToPage(self.currentPage - 1);
+          } else {
+            self.goToPage(self.currentPage);
+          }
+          $("#myTable").on("click", ".btn-delete", function () {
+            const productId = $(this).data("id");
+            self.deleteProduct(productId);
+          });
+        });
+    },
+    goToPage(page) {
+      const table = $("#myTable").DataTable();
+      table.page(page - 1).draw(false);
+    },
   },
 
   mounted() {
-    // Di dalam mounted, Anda akan mengambil data untuk halaman pertama secara default
-    this.searchFood();
+    this.initializeDataTable();
+    // Set the initial page to 3 (or any other page you want to start with)
   },
 };
 </script>
